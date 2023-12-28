@@ -166,10 +166,12 @@ public class NIOServerCnxn extends ServerCnxn {
     private void handleFailedRead() throws EndOfStreamException {
         setStale();
         ServerMetrics.getMetrics().CONNECTION_DROP_COUNT.add(1);
+        this.zkServer.closeSession(sessionId);
         throw new EndOfStreamException("Unable to read additional data from client,"
                                        + " it probably closed the socket:"
                                        + " address = " + sock.socket().getRemoteSocketAddress() + ","
-                                       + " session = 0x" + Long.toHexString(sessionId),
+                                       + " session = 0x" + Long.toHexString(sessionId) + ". "
+                                       + " Session will be closed immediately!",
                                        DisconnectReason.UNABLE_TO_READ_FROM_CLIENT);
     }
 

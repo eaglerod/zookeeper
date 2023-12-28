@@ -145,8 +145,14 @@ public class NettyServerCnxn extends ServerCnxn {
                 }
             });
         } else {
+
             ServerMetrics.getMetrics().CONNECTION_DROP_COUNT.add(1);
             channel.eventLoop().execute(this::releaseQueuedBuffer);
+
+            if(disconnectReason.equals(DisconnectReason.CLIENT_CLOSED_CONNECTION) && zkServer != null){
+                zkServer.closeSession(sessionId);
+            }
+
         }
     }
 
